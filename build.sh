@@ -14,18 +14,17 @@ TARGET_ARCH=arm64
 LLVM_TARGETS_TO_BUILD=AArch64
 TARGET_ARCH_NAME=aarch64
 
-wget -c https://archive.mesa3d.org/mesa-${MESA_VERSION}.tar.xz
-echo "96a53501fd59679654273258c6c6a1055a20e352ee1429f0b123516c7190e5b0 mesa-25.0.0.tar.xz" | sha256sum -c 
-tar -xJvf mesa-25.0.0.tar.xz
-mv mesa-${MESA_VERSION} mesa.src
-mkdir -p mesa.src/subprojects/llvm && cp meson.llvm.build mesa.src/subprojects/llvm/meson.build
+wget -c -nv https://archive.mesa3d.org/mesa-${MESA_VERSION}.tar.xz
+echo "96a53501fd59679654273258c6c6a1055a20e352ee1429f0b123516c7190e5b0 mesa-${MESA_VERSION}.tar.xz" | sha256sum -c
+tar -xJf mesa-25.0.0.tar.xz
 
-wget -c https://github.com/llvm/llvm-project/releases/download/llvmorg-${LLVM_VERSION}/llvm-${LLVM_VERSION}.src.tar.xz
-wget -c https://github.com/llvm/llvm-project/releases/download/llvmorg-${LLVM_VERSION}/cmake-${LLVM_VERSION}.src.tar.xz
-tar -xJvf llvm-${LLVM_VERSION}.src.tar.xz
-tar -xJvf cmake-${LLVM_VERSION}.src.tar.xz
+wget -c -nv https://github.com/llvm/llvm-project/releases/download/llvmorg-${LLVM_VERSION}/llvm-${LLVM_VERSION}.src.tar.xz
+wget -c -nv https://github.com/llvm/llvm-project/releases/download/llvmorg-${LLVM_VERSION}/cmake-${LLVM_VERSION}.src.tar.xz
+tar -xJf llvm-${LLVM_VERSION}.src.tar.xz
+tar -xJf cmake-${LLVM_VERSION}.src.tar.xz
 
 (
+    rm -rf llvm.src cmake
     mv llvm-${LLVM_VERSION}.src llvm.src
     mv cmake-${LLVM_VERSION}.src cmake
     cmake \
@@ -78,8 +77,11 @@ tar -xJvf cmake-${LLVM_VERSION}.src.tar.xz
     source builder-venv/bin/activate && python3 -V
     pip install --upgrade pip
     pip install mako packaging setuptools pyyaml
-    #PATH=`pwd`/llvm-native/bin:$PATH
-    #llvm-config --components
+
+    rm -rf mesa.src
+    mv mesa-${MESA_VERSION} mesa.src
+    mkdir -p mesa.src/subprojects/llvm && cp meson.llvm.build mesa.src/subprojects/llvm/meson.build
+
     meson setup \
           mesa.build-${MESA_ARCH} \
           mesa.src \
@@ -95,4 +97,26 @@ tar -xJvf cmake-${LLVM_VERSION}.src.tar.xz
           -Dvulkan-drivers=swrast
     ninja -C mesa.build-${MESA_ARCH} install
     #python mesa.src/src/vulkan/util/vk_icd_gen.py --api-version 1.4 --xml mesa.src/src/vulkan/registry/vk.xml --lib-path vulkan_lvp.dylib --out mesa-llvmpipe-${MESA_ARCH}/bin/lvp_icd.${TARGET_ARCH_NAME}.json
+    otool -L mesa-llvmpipe-${MESA_ARCH}/lib/libOSMesa*dylib
+    otool -L mesa-llvmpipe-${MESA_ARCH}/lib/libvulkan_lvp.dylib
 )
+
+if [ "${GITHUB_WORKFLOW}" != "" ]; then
+    (
+        mkdir archive-osmesa
+        cd archive-osmesa
+        cp ../mesa-llvmpipe-${MESA_ARCH}/lib/libOSMesa*dylib .
+        cp ../mesa-llvmpipe-${MESA_ARCH}/include/GL/osmesa.h .
+        zip -r9v ../mesa-osmesa-${MESA_ARCH}-${MESA_VERSION}.zip *
+    )
+    (
+        mkdir archive-lavapipe
+        cd archive-lavapipe
+        cp ../mesa-llvmpipe-${MESA_ARCH}/lib/libvulkan_lvp.dylib .
+        cp ../mesa-llvmpipe-${MESA_ARCH}/share/vulkan/icd.d/lvp_icd.aarch64.json .
+        zip -r9v ../mesa-lavapipe-${MESA_ARCH}-${MESA_VERSION}.zip * 
+    )
+
+    echo LLVM_VERSION=${LLVM_VERSION}>>${GITHUB_OUTPUT}
+    echo MESA_VERSION=${MESA_VERSION}>>${GITHUB_OUTPUT}
+fi

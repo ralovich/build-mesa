@@ -6,8 +6,8 @@ set -x # echo commands
 
 # brew install glslang
 
-LLVM_VERSION=20.1.0-rc2
-MESA_VERSION=25.0.0
+LLVM_VERSION=20.1.8
+MESA_VERSION=25.1.0
 
 MESA_ARCH=arm64
 TARGET_ARCH=arm64

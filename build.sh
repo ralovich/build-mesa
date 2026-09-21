@@ -6,7 +6,7 @@ set -x # echo commands
 
 # brew install glslang
 
-LLVM_VERSION=20.1.8
+LLVM_VERSION=21.1.8
 MESA_VERSION=25.2.0
 
 MESA_ARCH=arm64
@@ -18,15 +18,19 @@ wget -c -nv https://archive.mesa3d.org/mesa-${MESA_VERSION}.tar.xz
 echo "7c726b21c074d14d31d253d638b741422f3c0a497ce7f1b4aaaa917d10bd8d4f mesa-${MESA_VERSION}.tar.xz" | sha256sum -c
 tar -xJf mesa-${MESA_VERSION}.tar.xz
 
-wget -c -nv https://github.com/llvm/llvm-project/releases/download/llvmorg-${LLVM_VERSION}/llvm-${LLVM_VERSION}.src.tar.xz
-wget -c -nv https://github.com/llvm/llvm-project/releases/download/llvmorg-${LLVM_VERSION}/cmake-${LLVM_VERSION}.src.tar.xz
-tar -xJf llvm-${LLVM_VERSION}.src.tar.xz
-tar -xJf cmake-${LLVM_VERSION}.src.tar.xz
+wget -c -nv https://github.com/llvm/llvm-project/releases/download/llvmorg-${LLVM_VERSION}/llvm-project-${LLVM_VERSION}.src.tar.xz
+tar -xJf llvm-project-${LLVM_VERSION}.src.tar.xz
+#wget -c -nv https://github.com/llvm/llvm-project/releases/download/llvmorg-${LLVM_VERSION}/llvm-${LLVM_VERSION}.src.tar.xz
+#wget -c -nv https://github.com/llvm/llvm-project/releases/download/llvmorg-${LLVM_VERSION}/cmake-${LLVM_VERSION}.src.tar.xz
+#tar -xJf llvm-${LLVM_VERSION}.src.tar.xz
+#tar -xJf cmake-${LLVM_VERSION}.src.tar.xz
 
 (
     rm -rf llvm.src cmake
-    mv llvm-${LLVM_VERSION}.src llvm.src
-    mv cmake-${LLVM_VERSION}.src cmake
+    mv llvm-project-${LLVM_VERSION}.src/llvm llvm.src
+    mv llvm-project-${LLVM_VERSION}.src/cmake cmake
+    mv llvm-project-${LLVM_VERSION}.src/third-party third-party
+    #mv cmake-${LLVM_VERSION}.src/cmake cmake
     cmake \
         -G Ninja \
         -S llvm.src \

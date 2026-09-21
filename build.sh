@@ -19,6 +19,7 @@ echo "0fd54fea7dbbddb154df05ac752b18621f26d97e27863db3be951417c6abe8ae mesa-${ME
 tar -xJf mesa-${MESA_VERSION}.tar.xz
 
 wget -c -nv https://github.com/llvm/llvm-project/releases/download/llvmorg-${LLVM_VERSION}/llvm-project-${LLVM_VERSION}.src.tar.xz
+echo "4633a23617fa31a3ea51242586ea7fb1da7140e426bd62fc164261fe036aa142 llvm-project-${LLVM_VERSION}.src.tar.xz" | sha256sum -c
 tar -xJf llvm-project-${LLVM_VERSION}.src.tar.xz
 
 (

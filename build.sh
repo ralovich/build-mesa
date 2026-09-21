@@ -16,7 +16,7 @@ TARGET_ARCH_NAME=aarch64
 
 wget -c -nv https://archive.mesa3d.org/mesa-${MESA_VERSION}.tar.xz
 echo "96a53501fd59679654273258c6c6a1055a20e352ee1429f0b123516c7190e5b0 mesa-${MESA_VERSION}.tar.xz" | sha256sum -c
-tar -xJf mesa-25.0.0.tar.xz
+tar -xJf mesa-${MESA_VERSION}.tar.xz
 
 wget -c -nv https://github.com/llvm/llvm-project/releases/download/llvmorg-${LLVM_VERSION}/llvm-${LLVM_VERSION}.src.tar.xz
 wget -c -nv https://github.com/llvm/llvm-project/releases/download/llvmorg-${LLVM_VERSION}/cmake-${LLVM_VERSION}.src.tar.xz

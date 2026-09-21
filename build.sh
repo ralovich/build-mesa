@@ -6,7 +6,7 @@ set -x # echo commands
 
 # brew install glslang
 
-LLVM_VERSION=21.1.8
+LLVM_VERSION=23.1.1
 MESA_VERSION=25.3.1
 
 MESA_ARCH=arm64
@@ -19,7 +19,7 @@ echo "059d0d985622f49588f01aa29152804f4da8ffe6add046e00a52923379c2d8da mesa-${ME
 tar -xJf mesa-${MESA_VERSION}.tar.xz
 
 wget -c -nv https://github.com/llvm/llvm-project/releases/download/llvmorg-${LLVM_VERSION}/llvm-project-${LLVM_VERSION}.src.tar.xz
-echo "4633a23617fa31a3ea51242586ea7fb1da7140e426bd62fc164261fe036aa142 llvm-project-${LLVM_VERSION}.src.tar.xz" | sha256sum -c
+echo "ebe9be46fe8756d58c5b198ffad0fa2a766257add81a4dc52179bfacc7888ee6 llvm-project-${LLVM_VERSION}.src.tar.xz" | sha256sum -c
 tar -xJf llvm-project-${LLVM_VERSION}.src.tar.xz
 
 (
@@ -27,6 +27,7 @@ tar -xJf llvm-project-${LLVM_VERSION}.src.tar.xz
     mv llvm-project-${LLVM_VERSION}.src/llvm llvm.src
     mv llvm-project-${LLVM_VERSION}.src/cmake cmake
     mv llvm-project-${LLVM_VERSION}.src/third-party third-party
+    mv llvm-project-${LLVM_VERSION}.src/libc libc
     cmake \
         -G Ninja \
         -S llvm.src \

@@ -23,7 +23,7 @@ echo "ebe9be46fe8756d58c5b198ffad0fa2a766257add81a4dc52179bfacc7888ee6 llvm-proj
 tar -xJf llvm-project-${LLVM_VERSION}.src.tar.xz
 
 (
-    rm -rf llvm.src cmake
+    rm -rf llvm.src cmake third-party libc
     mv llvm-project-${LLVM_VERSION}.src/llvm llvm.src
     mv llvm-project-${LLVM_VERSION}.src/cmake cmake
     mv llvm-project-${LLVM_VERSION}.src/third-party third-party

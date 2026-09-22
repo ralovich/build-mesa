@@ -24,12 +24,12 @@ jobs:
       - name: Install Homebrew build-deps
         if: runner.os == 'macOS'
         run: |
-          brew install coreutils glslang ninja meson
+          brew install coreutils glslang ninja meson libxshmfence
 
       - name: build
         id: build
         shell: bash
-        run: ./build.sh ${{ matrix.arch }}
+        run: PATH="/opt/homebrew/opt/coreutils/libexec/gnubin:$PATH" ./build.sh ${{ matrix.arch }}
 
       - name: upload artifacts
         uses: actions/upload-artifact@v7

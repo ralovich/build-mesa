@@ -24,7 +24,7 @@ jobs:
       - name: Install Homebrew build-deps
         if: runner.os == 'macOS'
         run: |
-          brew install coreutils glslang ninja meson
+          brew install coreutils glslang ninja meson libxshmfence libxrandr
 
       - name: build
         id: build

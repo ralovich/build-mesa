@@ -6,7 +6,7 @@ set -x # echo commands
 
 # brew install glslang
 
-LLVM_VERSION=23.1.1
+LLVM_VERSION=23.1.2
 MESA_VERSION=26.2.3
 
 MESA_ARCH=arm64
@@ -19,7 +19,7 @@ echo "1628058a8d2c0615975de5a15ab7bbb9638c50000b5bed9456ff423ea034a81f mesa-${ME
 tar -xJf mesa-${MESA_VERSION}.tar.xz
 
 wget -c -nv https://github.com/llvm/llvm-project/releases/download/llvmorg-${LLVM_VERSION}/llvm-project-${LLVM_VERSION}.src.tar.xz
-echo "ebe9be46fe8756d58c5b198ffad0fa2a766257add81a4dc52179bfacc7888ee6 llvm-project-${LLVM_VERSION}.src.tar.xz" | sha256sum -c
+echo "c98bbef08a2b4c2613cd50e9aa9ae7b69b1fe6c16b2c40373bc0ab6116fdf78a llvm-project-${LLVM_VERSION}.src.tar.xz" | sha256sum -c
 tar -xJf llvm-project-${LLVM_VERSION}.src.tar.xz
 
 (

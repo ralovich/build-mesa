@@ -2,6 +2,8 @@ project('llvm', ['cpp'])
 
 cpp = meson.get_compiler('cpp')
 
+llvm_version = '23.1.1'
+
 deps = ['LLVMAggressiveInstCombine',
         'LLVMAnalysis',
         'LLVMAsmParser',
@@ -91,5 +93,5 @@ endforeach
 dep_llvm = declare_dependency(
   include_directories : include_directories(folder + '/include'),
   dependencies : _deps,
-  version : '23.1.1',
+  version : llvm_version,
 )

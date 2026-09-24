@@ -4,7 +4,9 @@ set -e # bail on failure
 set -x # echo commands
 
 
-# brew install glslang
+# brew install coreutils glslang ninja meson libxshmfence libxrandr bison
+PATH="/opt/homebrew/opt/coreutils/libexec/gnubin:/opt/homebrew/opt/bison/bin:$PATH"
+export PATH
 
 LLVM_VERSION=23.1.2
 MESA_VERSION=26.2.3

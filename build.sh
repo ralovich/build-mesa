@@ -94,8 +94,12 @@ tar -xJf llvm-project-${LLVM_VERSION}.src.tar.xz
           -Db_ndebug=true \
           -Dllvm=enabled \
           -Dplatforms=macos \
+          -Dglx=disabled \
           -Dgallium-drivers=llvmpipe \
-          -Dvulkan-drivers=swrast
+          -Dvulkan-drivers=swrast \
+          -Dopengl=false \
+          -Dgles1=disabled \
+          -Dgles2=disabled
     ninja -C mesa.build-${MESA_ARCH} install
     #python mesa.src/src/vulkan/util/vk_icd_gen.py --api-version 1.4 --xml mesa.src/src/vulkan/registry/vk.xml --lib-path vulkan_lvp.dylib --out mesa-lavapipe-${MESA_ARCH}/bin/lvp_icd.${TARGET_ARCH_NAME}.json
     # otool -L mesa-llvmpipe-${MESA_ARCH}/lib/libOSMesa*dylib
@@ -114,6 +118,7 @@ tar -xJf llvm-project-${LLVM_VERSION}.src.tar.xz
           -Dplatforms=macos,x11 \
           -Dglx=auto \
           -Dgallium-drivers=llvmpipe \
+          -Dvulkan-drivers= \
           -Dopengl=true \
           -Dgles1=enabled \
           -Dgles2=enabled

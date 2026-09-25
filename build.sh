@@ -88,6 +88,24 @@ tar -xJf llvm-project-${LLVM_VERSION}.src.tar.xz
     meson setup \
           mesa.build-${MESA_ARCH} \
           mesa.src \
+          --prefix="`pwd`/mesa-lavapipe-${MESA_ARCH}" \
+          --default-library=static \
+          -Dbuildtype=release \
+          -Db_ndebug=true \
+          -Dllvm=enabled \
+          -Dplatforms=macos \
+          -Dgallium-drivers=llvmpipe \
+          -Dvulkan-drivers=swrast
+    ninja -C mesa.build-${MESA_ARCH} install
+    #python mesa.src/src/vulkan/util/vk_icd_gen.py --api-version 1.4 --xml mesa.src/src/vulkan/registry/vk.xml --lib-path vulkan_lvp.dylib --out mesa-lavapipe-${MESA_ARCH}/bin/lvp_icd.${TARGET_ARCH_NAME}.json
+    # otool -L mesa-llvmpipe-${MESA_ARCH}/lib/libOSMesa*dylib
+    ls -las1 mesa-lavapipe-${MESA_ARCH}/lib
+    otool -L mesa-lavapipe-${MESA_ARCH}/lib/libvulkan_lvp.dylib
+
+
+    meson setup \
+          mesa.build-${MESA_ARCH} \
+          mesa.src \
           --prefix="`pwd`/mesa-llvmpipe-${MESA_ARCH}" \
           --default-library=static \
           -Dbuildtype=release \
@@ -96,15 +114,15 @@ tar -xJf llvm-project-${LLVM_VERSION}.src.tar.xz
           -Dplatforms=macos,x11 \
           -Dglx=auto \
           -Dgallium-drivers=llvmpipe \
-          -Dvulkan-drivers=swrast \
           -Dopengl=true \
           -Dgles1=enabled \
           -Dgles2=enabled
     ninja -C mesa.build-${MESA_ARCH} install
     #python mesa.src/src/vulkan/util/vk_icd_gen.py --api-version 1.4 --xml mesa.src/src/vulkan/registry/vk.xml --lib-path vulkan_lvp.dylib --out mesa-llvmpipe-${MESA_ARCH}/bin/lvp_icd.${TARGET_ARCH_NAME}.json
     # otool -L mesa-llvmpipe-${MESA_ARCH}/lib/libOSMesa*dylib
-    ls -las1 mesa-llvmpipe-${MESA_ARCH}/lib
-    otool -L mesa-llvmpipe-${MESA_ARCH}/lib/libvulkan_lvp.dylib
+    ls -las1R mesa-llvmpipe-${MESA_ARCH}/lib
+    ls -las1R mesa-llvmpipe-${MESA_ARCH}/include
+    #otool -L mesa-llvmpipe-${MESA_ARCH}/lib/libvulkan_lvp.dylib
 )
 
 if [ "${GITHUB_WORKFLOW}" != "" ]; then
@@ -118,9 +136,16 @@ if [ "${GITHUB_WORKFLOW}" != "" ]; then
     (
         mkdir archive-lavapipe
         cd archive-lavapipe
-        cp ../mesa-llvmpipe-${MESA_ARCH}/lib/libvulkan_lvp.dylib .
-        cp ../mesa-llvmpipe-${MESA_ARCH}/share/vulkan/icd.d/lvp_icd.aarch64.json .
+        cp ../mesa-lavapipe-${MESA_ARCH}/lib/libvulkan_lvp.dylib .
+        cp ../mesa-lavapipe-${MESA_ARCH}/share/vulkan/icd.d/lvp_icd.aarch64.json .
         zip -r9v ../mesa-lavapipe-${MESA_ARCH}-${MESA_VERSION}.zip * 
+    )
+    (
+        mkdir archive-llvmpipe
+        cd archive-llvmpipe
+        cp ../mesa-llvmpipe-${MESA_ARCH}/lib/lib*GL*dylib .
+        #cp ../mesa-llvmpipe-${MESA_ARCH}/include/GL/osmesa.h .
+        zip -r9v ../mesa-llvmpipe-${MESA_ARCH}-${MESA_VERSION}.zip *
     )
 
     echo LLVM_VERSION=${LLVM_VERSION}>>${GITHUB_OUTPUT}

@@ -148,7 +148,9 @@ if [ "${GITHUB_WORKFLOW}" != "" ]; then
     (
         mkdir archive-llvmpipe
         cd archive-llvmpipe
-        cp ../mesa-llvmpipe-${MESA_ARCH}/lib/lib*GL*dylib .
+        #cp ../mesa-llvmpipe-${MESA_ARCH}/lib/lib*GL*dylib .
+        cp -r ../mesa-llvmpipe-${MESA_ARCH}/lib .
+        cp -r ../mesa-llvmpipe-${MESA_ARCH}/include .
         #cp ../mesa-llvmpipe-${MESA_ARCH}/include/GL/osmesa.h .
         zip -r9v ../mesa-llvmpipe-${MESA_ARCH}-${MESA_VERSION}.zip *
     )

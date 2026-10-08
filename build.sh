@@ -4,10 +4,12 @@ set -e # bail on failure
 set -x # echo commands
 
 
-# brew install glslang
+# brew install coreutils glslang ninja meson libxshmfence libxrandr bison
+PATH="/opt/homebrew/opt/coreutils/libexec/gnubin:/opt/homebrew/opt/bison/bin:$PATH"
+export PATH
 
-LLVM_VERSION=23.1.2
-MESA_VERSION=26.2.3
+LLVM_VERSION=23.1.3
+MESA_VERSION=26.2.4
 
 MESA_ARCH=arm64
 TARGET_ARCH=arm64
@@ -15,11 +17,11 @@ LLVM_TARGETS_TO_BUILD=AArch64
 TARGET_ARCH_NAME=aarch64
 
 wget -c -nv https://archive.mesa3d.org/mesa-${MESA_VERSION}.tar.xz
-echo "1628058a8d2c0615975de5a15ab7bbb9638c50000b5bed9456ff423ea034a81f mesa-${MESA_VERSION}.tar.xz" | sha256sum -c
+echo "bce5f7fbebb934373b86c999a064d52fb5065878dc57f287f95346648ec832e9 mesa-${MESA_VERSION}.tar.xz" | sha256sum -c
 tar -xJf mesa-${MESA_VERSION}.tar.xz
 
 wget -c -nv https://github.com/llvm/llvm-project/releases/download/llvmorg-${LLVM_VERSION}/llvm-project-${LLVM_VERSION}.src.tar.xz
-echo "c98bbef08a2b4c2613cd50e9aa9ae7b69b1fe6c16b2c40373bc0ab6116fdf78a llvm-project-${LLVM_VERSION}.src.tar.xz" | sha256sum -c
+echo "c44186a7762ed28954be72e5ff6df9808e0779d4f1bf014ecc4e7e211d31ee34 llvm-project-${LLVM_VERSION}.src.tar.xz" | sha256sum -c
 tar -xJf llvm-project-${LLVM_VERSION}.src.tar.xz
 
 (
@@ -86,7 +88,7 @@ tar -xJf llvm-project-${LLVM_VERSION}.src.tar.xz
     meson setup \
           mesa.build-${MESA_ARCH} \
           mesa.src \
-          --prefix="`pwd`/mesa-llvmpipe-${MESA_ARCH}" \
+          --prefix="`pwd`/mesa-lavapipe-${MESA_ARCH}" \
           --default-library=static \
           -Dbuildtype=release \
           -Db_ndebug=true \
@@ -94,11 +96,38 @@ tar -xJf llvm-project-${LLVM_VERSION}.src.tar.xz
           -Dplatforms=macos \
           -Dglx=disabled \
           -Dgallium-drivers=llvmpipe \
-          -Dvulkan-drivers=swrast
+          -Dvulkan-drivers=swrast \
+          -Dopengl=false \
+          -Dgles1=disabled \
+          -Dgles2=disabled
+    ninja -C mesa.build-${MESA_ARCH} install
+    #python mesa.src/src/vulkan/util/vk_icd_gen.py --api-version 1.4 --xml mesa.src/src/vulkan/registry/vk.xml --lib-path vulkan_lvp.dylib --out mesa-lavapipe-${MESA_ARCH}/bin/lvp_icd.${TARGET_ARCH_NAME}.json
+    # otool -L mesa-llvmpipe-${MESA_ARCH}/lib/libOSMesa*dylib
+    ls -las1 mesa-lavapipe-${MESA_ARCH}/lib
+    otool -L mesa-lavapipe-${MESA_ARCH}/lib/libvulkan_lvp.dylib
+
+
+    meson setup \
+          mesa.build-${MESA_ARCH} \
+          mesa.src \
+          --prefix="`pwd`/mesa-llvmpipe-${MESA_ARCH}" \
+          --default-library=static \
+          -Dbuildtype=release \
+          -Db_ndebug=true \
+          -Dllvm=enabled \
+          -Dplatforms=macos,x11 \
+          -Dglx=auto \
+          -Dgallium-drivers=llvmpipe \
+          -Dvulkan-drivers= \
+          -Dopengl=true \
+          -Dgles1=enabled \
+          -Dgles2=enabled
     ninja -C mesa.build-${MESA_ARCH} install
     #python mesa.src/src/vulkan/util/vk_icd_gen.py --api-version 1.4 --xml mesa.src/src/vulkan/registry/vk.xml --lib-path vulkan_lvp.dylib --out mesa-llvmpipe-${MESA_ARCH}/bin/lvp_icd.${TARGET_ARCH_NAME}.json
     # otool -L mesa-llvmpipe-${MESA_ARCH}/lib/libOSMesa*dylib
-    otool -L mesa-llvmpipe-${MESA_ARCH}/lib/libvulkan_lvp.dylib
+    ls -las1R mesa-llvmpipe-${MESA_ARCH}/lib
+    ls -las1R mesa-llvmpipe-${MESA_ARCH}/include
+    #otool -L mesa-llvmpipe-${MESA_ARCH}/lib/libvulkan_lvp.dylib
 )
 
 if [ "${GITHUB_WORKFLOW}" != "" ]; then
@@ -112,9 +141,18 @@ if [ "${GITHUB_WORKFLOW}" != "" ]; then
     (
         mkdir archive-lavapipe
         cd archive-lavapipe
-        cp ../mesa-llvmpipe-${MESA_ARCH}/lib/libvulkan_lvp.dylib .
-        cp ../mesa-llvmpipe-${MESA_ARCH}/share/vulkan/icd.d/lvp_icd.aarch64.json .
+        cp ../mesa-lavapipe-${MESA_ARCH}/lib/libvulkan_lvp.dylib .
+        cp ../mesa-lavapipe-${MESA_ARCH}/share/vulkan/icd.d/lvp_icd.aarch64.json .
         zip -r9v ../mesa-lavapipe-${MESA_ARCH}-${MESA_VERSION}.zip * 
+    )
+    (
+        mkdir archive-llvmpipe
+        cd archive-llvmpipe
+        #cp ../mesa-llvmpipe-${MESA_ARCH}/lib/lib*GL*dylib .
+        cp -r ../mesa-llvmpipe-${MESA_ARCH}/lib .
+        cp -r ../mesa-llvmpipe-${MESA_ARCH}/include .
+        #cp ../mesa-llvmpipe-${MESA_ARCH}/include/GL/osmesa.h .
+        zip -r9v ../mesa-llvmpipe-${MESA_ARCH}-${MESA_VERSION}.zip *
     )
 
     echo LLVM_VERSION=${LLVM_VERSION}>>${GITHUB_OUTPUT}

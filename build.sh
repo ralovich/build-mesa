@@ -8,7 +8,7 @@ set -x # echo commands
 PATH="/opt/homebrew/opt/coreutils/libexec/gnubin:/opt/homebrew/opt/bison/bin:$PATH"
 export PATH
 
-LLVM_VERSION=23.1.2
+LLVM_VERSION=23.1.3
 MESA_VERSION=26.2.3
 
 MESA_ARCH=arm64
@@ -21,7 +21,7 @@ echo "1628058a8d2c0615975de5a15ab7bbb9638c50000b5bed9456ff423ea034a81f mesa-${ME
 tar -xJf mesa-${MESA_VERSION}.tar.xz
 
 wget -c -nv https://github.com/llvm/llvm-project/releases/download/llvmorg-${LLVM_VERSION}/llvm-project-${LLVM_VERSION}.src.tar.xz
-echo "c98bbef08a2b4c2613cd50e9aa9ae7b69b1fe6c16b2c40373bc0ab6116fdf78a llvm-project-${LLVM_VERSION}.src.tar.xz" | sha256sum -c
+echo "c44186a7762ed28954be72e5ff6df9808e0779d4f1bf014ecc4e7e211d31ee34 llvm-project-${LLVM_VERSION}.src.tar.xz" | sha256sum -c
 tar -xJf llvm-project-${LLVM_VERSION}.src.tar.xz
 
 (

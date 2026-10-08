@@ -9,7 +9,7 @@ PATH="/opt/homebrew/opt/coreutils/libexec/gnubin:/opt/homebrew/opt/bison/bin:$PA
 export PATH
 
 LLVM_VERSION=23.1.3
-MESA_VERSION=26.2.3
+MESA_VERSION=26.2.4
 
 MESA_ARCH=arm64
 TARGET_ARCH=arm64
@@ -17,7 +17,7 @@ LLVM_TARGETS_TO_BUILD=AArch64
 TARGET_ARCH_NAME=aarch64
 
 wget -c -nv https://archive.mesa3d.org/mesa-${MESA_VERSION}.tar.xz
-echo "1628058a8d2c0615975de5a15ab7bbb9638c50000b5bed9456ff423ea034a81f mesa-${MESA_VERSION}.tar.xz" | sha256sum -c
+echo "bce5f7fbebb934373b86c999a064d52fb5065878dc57f287f95346648ec832e9 mesa-${MESA_VERSION}.tar.xz" | sha256sum -c
 tar -xJf mesa-${MESA_VERSION}.tar.xz
 
 wget -c -nv https://github.com/llvm/llvm-project/releases/download/llvmorg-${LLVM_VERSION}/llvm-project-${LLVM_VERSION}.src.tar.xz
